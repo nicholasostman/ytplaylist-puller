@@ -26,8 +26,8 @@ func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
 		log.Fatalf("Unable to get path to cached credential file. %v", err)
 	}
 	tok, err := tokenFromFile(cacheFile)
-	fmt.Printf("what error %v", err)
 	if err != nil {
+		fmt.Printf("%v\n", err)
 		tok = getTokenFromWeb(config)
 		saveToken(cacheFile, tok)
 	}
@@ -36,6 +36,7 @@ func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
 
 // getTokenFromWeb uses Config to request a Token.
 // It returns the retrieved Token.
+// offline is actually just a refresh token
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
@@ -63,8 +64,6 @@ func tokenCacheFile() (string, error) {
 	fmt.Printf("Home directory: %v\n", usr.HomeDir)
 	tokenCacheDir := filepath.Join(usr.HomeDir, ".credentials")
 	os.MkdirAll(tokenCacheDir, 0700)
-	// TODO probably below I need to actually cache a file?
-	// or just drop secret into .credentials.
 
 	return filepath.Join(tokenCacheDir,
 		url.QueryEscape(nameOfJson)), err
