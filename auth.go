@@ -16,7 +16,7 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
-const nameOfJson = `client_secret.json`
+const nameOfJson = `oauthToken.json`
 
 // getClient uses a Context and Config to retrieve a Token
 // then generate a Client. It returns the generated Client.
@@ -36,11 +36,20 @@ func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
 
 // getTokenFromWeb uses Config to request a Token.
 // It returns the retrieved Token.
-// offline is actually just a refresh token
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
+
+	// TODO fetching of auth code and inserting programmatically rather than
+	// auth=portion of URL (end has extra stuff too) first time?
+
+	// hit URL, can I do sign in process programmatically?
+	// get response see if same
+	// if not maybe debug?
+	// if as expected parse auth code and pull into code var
+
+	// could likely also just post the refresh token to refresh after initial.
 
 	var code string
 	if _, err := fmt.Scan(&code); err != nil {
@@ -95,28 +104,9 @@ func saveToken(file string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func handleError(err error, message string) {
-	if message == "" {
-		message = "Error making API call"
-	}
-	if err != nil {
-		log.Fatalf(message+": %v", err.Error())
-	}
-}
-
-func channelsListByUsername(service *youtube.Service, part []string, forUsername string) {
-	call := service.Channels.List(part)
-	call = call.ForUsername(forUsername)
-	response, err := call.Do()
-	handleError(err, "")
-	fmt.Println(fmt.Sprintf("This channel's ID is %s. Its title is '%s', "+
-		"and it has %d views.",
-		response.Items[0].Id,
-		response.Items[0].Snippet.Title,
-		response.Items[0].Statistics.ViewCount))
-}
-
-func RunAuth() {
+// sets up oath token
+// It returns a service
+func RunAuth() *youtube.Service {
 	ctx := context.Background()
 
 	b, err := os.ReadFile("client_secret.json")
@@ -133,8 +123,7 @@ func RunAuth() {
 	client := getClient(ctx, config)
 	service, err := youtube.New(client)
 
-	handleError(err, "Error creating YouTube client")
+	HandleError("Error creating YouTube client", err)
 
-	arguments := []string{"snippet", "contentDetails", "statistics"}
-	channelsListByUsername(service, arguments, "GoogleDevelopers")
+	return service
 }
