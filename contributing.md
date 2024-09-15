@@ -10,3 +10,7 @@ you'll want to read through [this to establish an SSH key.](https://docs.github.
 
  ## Writing Go
  https://go.dev/doc/code 
+
+ ## Auth
+configure your own token
+I did this, but it seems wonky at time of implementation: https://developers.google.com/youtube/v3/quickstart/go 

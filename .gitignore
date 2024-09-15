@@ -23,3 +23,12 @@ go.work.sum
 
 # env file
 .env
+
+# vsCode IDE
+.DS_Store
+
+# secrets
+client_secret*
+
+# miscellaneous
+privateLocalNotes.md
