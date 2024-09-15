@@ -7,3 +7,6 @@ you'll want to read through [this to establish an SSH key.](https://docs.github.
 [troubleshooting](https://docs.github.com/en/authentication/troubleshooting-ssh/error-permission-denied-publickey)
 
  do this for Git: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
+
+ ## Writing Go
+ https://go.dev/doc/code 
