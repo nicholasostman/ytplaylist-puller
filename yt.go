@@ -18,25 +18,35 @@ func ChannelsListByUsername(service *youtube.Service, parts []string, forUsernam
 		response.Items[0].Statistics.ViewCount))
 }
 
-// func PlaylistsListByChannelID(service *youtube.Service, parts []string, channelId string, pageToken string) *youtube.PlaylistListResponse {
-func PlaylistsListByChannelID(service *youtube.Service, parts []string, channelId string) *youtube.PlaylistListResponse {
+func PlaylistsListByChannelID(service *youtube.Service, parts []string, channelId string, maxResults int64, pageToken string) *youtube.PlaylistListResponse {
 	call := service.Playlists.List(parts)
 	call.ChannelId(channelId)
-	// if pageToken != "" {
-	// 	call = call.PageToken(pageToken)
-	// }
+	call.MaxResults(maxResults)
+	if pageToken != "" {
+		call = call.PageToken(pageToken)
+	}
 	response, err := call.Do()
 	HandleError("", err)
 	return response
 }
 
-// Retrieve playlistItems in the specified playlist
-func playlistItemsList(service *youtube.Service, parts []string, playlistId string, pageToken string) *youtube.PlaylistItemListResponse {
+// Retrieve playlistItems (videos) in the specified playlist
+func PlaylistItemsList(service *youtube.Service, parts []string, playlistId string, maxResults int64, pageToken string) *youtube.PlaylistItemListResponse {
 	call := service.PlaylistItems.List(parts)
 	call = call.PlaylistId(playlistId)
+	call.MaxResults(maxResults)
 	if pageToken != "" {
 		call = call.PageToken(pageToken)
 	}
+	response, err := call.Do()
+	HandleError("", err)
+	return response
+}
+
+// Retrieve resource for the authenticated user's channel
+func ChannelsListMine(service *youtube.Service, parts []string) *youtube.ChannelListResponse {
+	call := service.Channels.List(parts)
+	call = call.Mine(true)
 	response, err := call.Do()
 	HandleError("", err)
 	return response

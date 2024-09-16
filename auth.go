@@ -18,6 +18,9 @@ import (
 
 const nameOfJson = `oauthToken.json`
 
+// may need to adjust scopes : https://developers.google.com/identity/protocols/oauth2#scope-response
+// and or #4
+
 // getClient uses a Context and Config to retrieve a Token
 // then generate a Client. It returns the generated Client.
 func getClient(ctx context.Context, config *oauth2.Config) *http.Client {

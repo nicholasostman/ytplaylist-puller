@@ -6,11 +6,15 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"google.golang.org/api/youtube/v3"
 )
 
 const DELIMITER = ","
 const DIRECTORY_TO_STORE_OUTPUT = "/ytFiles"
 const FILE_MODE = os.FileMode(0700)
+
+const MAX_RESULTS = 50 // the max google allows rn is 50 per page.
+const MINE = false
 
 func main() {
 	service := RunAuth()
@@ -21,8 +25,6 @@ func main() {
 
 	// fullParts := []string{"contentDetails","id","localizations","player","snippet","status"}
 
-	// parts := []string{"snippet", "id=%s", os.Getenv("CHANNEL_ID")}
-
 	err := godotenv.Load()
 	if err != nil {
 		HandleError("Error loading .env file", err)
@@ -31,44 +33,57 @@ func main() {
 	channelId := os.Getenv("CHANNEL_ID")
 
 	parts := []string{"contentDetails", "snippet"}
-	playlistList := PlaylistsListByChannelID(service, parts, channelId)
 
-	today := time.Now().Format("Jan02-2006") // golang magic number
-	// could do t = time.Now()
-	// fmt.Sprintf("%s %02d %d", time.Month().String()[:3], t.Day(), t.Year())
+	nextPageToken := ""
+	// need to call to find out how many items
+	// I was going to use recursion or at least a while loop, but golang doesn't have null,
+	// it just has zero case, which won't work for this specific implementation
 
-	fileName := "ytList" + today + ".md"
+	var playlists = []*youtube.Playlist{}
+	var playlistListResponse *youtube.PlaylistListResponse
+
+	for {
+		// Retrieve next set of items in the playlist.
+		playlistListResponse = PlaylistsListByChannelID(service, parts, channelId, MAX_RESULTS, nextPageToken)
+
+		for _, playlist := range playlistListResponse.Items {
+			playlists = append(playlists, playlist)
+		}
+
+		// Set the page token to retrieve the next page of results
+		// exit the loop if all results have been retrieved.
+		nextPageToken = playlistListResponse.NextPageToken
+		if nextPageToken == "" {
+			break
+		}
+	}
+
+	// fmt.Printf("does it work? %t", len(playlists) == int(playlistListResponse.PageInfo.TotalResults))
+	// if (len(playlists) != int(playlistListResponse.PageInfo.TotalResults)) {
+	// 	Warn("Please check, it seems we couldn't gather all playlist information", nil)
+	// }
 
 	var sb strings.Builder
 
-	// this could break if massive number of playlists etc.
-	// could be better, but MVP first
-	// for _, playlist := range playlistList.Items {
-	// 	playlistId := playlist.Id
-	// 	snippet := playlist.Snippet
-	// 	playlistTitle := snippet.Title
-	// 	// desc := snippet.Description
+	for _, playlist := range playlists {
+		snippet := playlist.Snippet
+		playlistTitle := snippet.Title
 
-	// 	// Print the playlist ID and title for the playlist resource.
-	// 	fmt.Println(playlistId, ": ", playlistTitle)
-	// 	sb.WriteString(playlistTitle)
-	// }
-
-	// maxResults := 50 // the max google allows rn is 50 per page.
-
-	nextPageToken := ""
-	// I may refactor this, will think after I sleep lol, but could put in to have all pages be default returned
-	for _, playlist := range playlistList.Items {
-
-		sb.WriteString("PlayList: " + playlist.Snippet.Title + "\n")
+		sb.WriteString("PlayList: " + playlistTitle + "\n")
 		for {
 			// Retrieve next set of items in the playlist.
 			itemsParts := []string{"snippet"}
-			playlistResponse := playlistItemsList(service, itemsParts, playlist.Id, nextPageToken)
+			playlistResponse := PlaylistItemsList(service, itemsParts, playlist.Id, MAX_RESULTS, nextPageToken)
 
 			for _, playlistItem := range playlistResponse.Items {
-				title := playlistItem.Snippet.Title
-				videoId := playlistItem.Snippet.ResourceId.VideoId
+				itemSnippet := playlistItem.Snippet
+				title := itemSnippet.Title
+				videoId := itemSnippet.ResourceId.VideoId
+				// description := itemSnippet.Description
+
+				// fromChannelTitle := snippet.videoOwnerChannelTitle
+				// fromChannelId := snippet.videoOwnerChannelId
+				// sb.WriteString(title + DELIMITER + videoId + DELIMITER + fromChannelTitle + DELIMITER + fromChannelId + "\n")
 
 				sb.WriteString(title + DELIMITER + videoId + "\n")
 			}
@@ -81,6 +96,13 @@ func main() {
 			}
 		}
 	}
+
+	// Handle Output
+	today := time.Now().Format("Jan02-2006") // golang magic number
+	// could do t = time.Now()
+	// fmt.Sprintf("%s %02d %d", time.Month().String()[:3], t.Day(), t.Year())
+
+	fileName := "ytList" + today + ".md"
 
 	byteArray := []byte(sb.String())
 	homedir, err := os.UserHomeDir()

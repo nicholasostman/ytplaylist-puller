@@ -11,6 +11,9 @@ you'll want to read through [this to establish an SSH key.](https://docs.github.
  ## Writing Go
  https://go.dev/doc/code 
 
+ ### Helpful Examples
+ https://developers.google.com/youtube/v3/code_samples/go 
+
  ## Auth
 configure your own token
 I did this, but it seems wonky at time of implementation: https://developers.google.com/youtube/v3/quickstart/go 
