@@ -14,7 +14,6 @@ const DIRECTORY_TO_STORE_OUTPUT = "/ytFiles"
 const FILE_MODE = os.FileMode(0700)
 
 const MAX_RESULTS = 50 // the max google allows rn is 50 per page.
-const MINE = false
 
 func main() {
 	service := RunAuth()
