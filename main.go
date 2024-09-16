@@ -59,7 +59,7 @@ func main() {
 	}
 
 	// fmt.Printf("does it work? %t", len(playlists) == int(playlistListResponse.PageInfo.TotalResults))
-	// if (len(playlists) != int(playlistListResponse.PageInfo.TotalResults)) {
+	// if len(playlists) != int(playlistListResponse.PageInfo.TotalResults) {
 	// 	Warn("Please check, it seems we couldn't gather all playlist information", nil)
 	// }
 
