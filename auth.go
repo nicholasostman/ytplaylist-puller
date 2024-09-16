@@ -70,7 +70,6 @@ func tokenCacheFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("Home directory: %v\n", usr.HomeDir)
 	tokenCacheDir := filepath.Join(usr.HomeDir, ".credentials")
 	os.MkdirAll(tokenCacheDir, 0700)
 
