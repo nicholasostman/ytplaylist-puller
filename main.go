@@ -16,6 +16,7 @@ const FILE_MODE = os.FileMode(0700)
 const MAX_RESULTS = 50 // the max google allows rn is 50 per page.
 
 func main() {
+	// Manage scopes as needed within this function to access private resources or functionality to manage channel, videos, or profile
 	service := RunAuth()
 
 	// decent auth check, can be refactored to yield channelID from user.
@@ -29,8 +30,6 @@ func main() {
 		HandleError("Error loading .env file", err)
 	}
 
-	channelId := os.Getenv("CHANNEL_ID")
-
 	parts := []string{"contentDetails", "snippet"}
 
 	nextPageToken := ""
@@ -41,9 +40,11 @@ func main() {
 	var playlists = []*youtube.Playlist{}
 	var playlistListResponse *youtube.PlaylistListResponse
 
+	channelId := os.Getenv("CHANNEL_ID")
 	for {
 		// Retrieve next set of items in the playlist.
 		playlistListResponse = PlaylistsListByChannelID(service, parts, channelId, MAX_RESULTS, nextPageToken)
+		// playlistListResponse = PlaylistsListByMine(service, parts, MAX_RESULTS, nextPageToken)
 
 		for _, playlist := range playlistListResponse.Items {
 			playlists = append(playlists, playlist)

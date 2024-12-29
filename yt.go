@@ -30,6 +30,18 @@ func PlaylistsListByChannelID(service *youtube.Service, parts []string, channelI
 	return response
 }
 
+func PlaylistsListByMine(service *youtube.Service, parts []string, maxResults int64, pageToken string) *youtube.PlaylistListResponse {
+	call := service.Playlists.List(parts)
+	call.Mine(true)
+	call.MaxResults(maxResults)
+	if pageToken != "" {
+		call = call.PageToken(pageToken)
+	}
+	response, err := call.Do()
+	HandleError("", err)
+	return response
+}
+
 // Retrieve playlistItems (videos) in the specified playlist
 func PlaylistItemsList(service *youtube.Service, parts []string, playlistId string, maxResults int64, pageToken string) *youtube.PlaylistItemListResponse {
 	call := service.PlaylistItems.List(parts)

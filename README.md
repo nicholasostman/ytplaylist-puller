@@ -5,10 +5,21 @@ This app is intended to help you explore Google’s API offerings. Do not share 
 
 Currently utilizing V3 of Data API.
 
+Warn: The code works, but YouTube's APIs have been broken for a very long time. TL;DR is it will only pull public playlists. Some additional context: https://issuetracker.google.com/issues/368205247 (there are similar issues from years before too)
+
 your client secret json goes in the '.credentials' directory (within your home directory)
 
 # How to run
 clone the repo to pull down the code.
+make a `.env` file and set your `CHANNEL_ID=[YOURID]`
+install go
+`go install ytplaylist-puller` (one time)
+`go run ytplaylist-puller` (each time to run)
+the first time we will need to authenticate our account. 
+the terminal console will display a message to go to accounts.google.com to oath. After following that to a blank page "This site cannot be reached" your code will be in the browser url bar. Note there is extra stuff at the end of the url we don't need. We want everything from after the = in "code=" until right before the "&scope"
+copy and paste that value back into the terminal console. 
+
+If no error, the code will simply output a file in [homeDirectory]/ytFiles/ with the current date. 
 
 ### configure .env
 `go get github.com/joho/godotenv` so we can use a .env file
@@ -36,5 +47,5 @@ Click OK to save the task
 If you're interested in contributing you can reach out with an issue or just make a PR. 
 
 
-Limitations
+# Limitations
 apparently the 'watch later' playlist will not be listed in playlists. 

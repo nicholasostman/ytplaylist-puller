@@ -117,8 +117,8 @@ func RunAuth() *youtube.Service {
 	}
 
 	// If modifying these scopes, delete your previously saved credentials
-	// at ~/.credentials/youtube-go-quickstart.json
-	config, err := google.ConfigFromJSON(b, youtube.YoutubeReadonlyScope)
+	// at ~/.credentials/[nameOfJson].json
+	config, err := google.ConfigFromJSON(b, youtube.YoutubeForceSslScope)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
